@@ -16,7 +16,7 @@ router.get('/', auth, async (req, res) => {
 router.post('/track', async (req, res) => {
   try {
     const { event, metadata } = req.body;
-    const allowed = ['page_view', 'project_view', 'cv_download'];
+    const allowed = ['page_view', 'project_view', 'cv_download', 'cv_view'];
     if (!allowed.includes(event))
       return res.status(400).json({ error: 'Invalid event type' });
 

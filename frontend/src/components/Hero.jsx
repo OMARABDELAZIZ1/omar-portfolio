@@ -6,7 +6,7 @@ const phrases = ['Full-Stack Developer', 'React Specialist', 'Node.js Engineer',
 export default function Hero() {
   const canvasRef = useRef(null)
   const [typed, setTyped] = useState('')
-  const [stats, setStats] = useState({ visitors: 142, project_views: 389, cv_downloads: 27 })
+  const [stats, setStats] = useState({ visitors: 142, project_views: 389, cv_downloads: 27, cv_views: 12 })
 
   // Particles
   useEffect(() => {
@@ -64,9 +64,9 @@ export default function Hero() {
   }, [])
 
   // Counter animation
-  const [counts, setCounts] = useState({ v: 0, p: 0, c: 0 })
+  const [counts, setCounts] = useState({ v: 0, p: 0, cd: 0, cv: 0 })
   useEffect(() => {
-    const targets = { v: stats.visitors, p: stats.project_views, c: stats.cv_downloads }
+    const targets = { v: stats.visitors, p: stats.project_views, cd: stats.cv_downloads, cv: stats.cv_views || 0 }
     const steps = 50
     let step = 0
     const t = setInterval(() => {
@@ -74,7 +74,8 @@ export default function Hero() {
       setCounts({
         v: Math.round(targets.v * step / steps),
         p: Math.round(targets.p * step / steps),
-        c: Math.round(targets.c * step / steps)
+        cd: Math.round(targets.cd * step / steps),
+        cv: Math.round(targets.cv * step / steps)
       })
       if (step >= steps) clearInterval(t)
     }, 30)
@@ -127,11 +128,17 @@ export default function Hero() {
 
         <div style={{ display: 'flex', gap: '1rem', flexWrap: 'wrap', animation: 'fadeUp 0.8s 1s both' }}>
           <button className="btn-primary" onClick={() => scrollTo('projects')}>View My Work</button>
-          <button className="btn-outline" onClick={() => scrollTo('contact')}>Get In Touch</button>
+          <a href="/api/cv/preview" target="_blank" className="btn-outline">Preview CV</a>
+          <a href="/api/cv/download" className="btn-outline" style={{ borderColor: 'var(--accent2)', color: 'var(--accent2)' }}>Download CV</a>
         </div>
 
-        <div style={{ display: 'flex', gap: '3rem', marginTop: '4rem', animation: 'fadeUp 0.8s 1.2s both' }}>
-          {[['visitors', counts.v, 'VISITORS'], ['project_views', counts.p, 'PROJECT VIEWS'], ['cv_downloads', counts.c, 'CV DOWNLOADS']].map(([k, n, lbl]) => (
+        <div style={{ display: 'flex', gap: '3rem', marginTop: '4rem', animation: 'fadeUp 0.8s 1.2s both', flexWrap: 'wrap' }}>
+          {[
+            ['visitors', counts.v, 'VISITORS'],
+            ['project_views', counts.p, 'PROJECT VIEWS'],
+            ['cv_views', counts.cv, 'CV VIEWS'],
+            ['cv_downloads', counts.cd, 'CV DOWNLOADS']
+          ].map(([k, n, lbl]) => (
             <div key={k} style={{ textAlign: 'center' }}>
               <div style={{ fontFamily: 'var(--font-display)', fontSize: '2.2rem', fontWeight: 800 }} className="neon-text">{n}</div>
               <div style={{ fontFamily: 'var(--font-mono)', fontSize: '0.62rem', color: 'var(--muted)', letterSpacing: '0.1em', marginTop: 2 }}>{lbl}</div>

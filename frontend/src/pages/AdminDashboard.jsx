@@ -3,7 +3,7 @@ import { useNavigate } from 'react-router-dom'
 import { useAuth } from '../context/AuthContext'
 import api from '../utils/api'
 
-const TABS = ['Overview', 'Projects', 'Messages']
+const TABS = ['Overview', 'Projects', 'Messages', 'CV']
 
 export default function AdminDashboard() {
   const { admin, logout } = useAuth()
@@ -60,6 +60,7 @@ export default function AdminDashboard() {
             {tab === 'Overview' && <Overview stats={stats} projects={projects} contacts={contacts} />}
             {tab === 'Projects' && <ProjectsCRUD projects={projects} setProjects={setProjects} />}
             {tab === 'Messages' && <Messages contacts={contacts} />}
+            {tab === 'CV' && <CVManager />}
           </>
         )}
       </div>
@@ -72,6 +73,7 @@ function Overview({ stats, projects, contacts }) {
   const cards = [
     ['Visitors', stats?.visitors ?? 142, '👁'],
     ['Project Views', stats?.project_views ?? 389, '📊'],
+    ['CV Views', stats?.cv_views ?? 0, '👁'],
     ['CV Downloads', stats?.cv_downloads ?? 27, '📄'],
     ['Total Projects', stats?.total_projects ?? projects.length, '⚡'],
     ['Messages', stats?.total_contacts ?? contacts.length, '💬']
@@ -113,6 +115,75 @@ function Overview({ stats, projects, contacts }) {
           ))}
           {contacts.length === 0 && <div style={{ fontSize: '0.85rem', color: 'var(--muted)' }}>No messages yet.</div>}
         </div>
+      </div>
+    </div>
+  )
+}
+
+// ─── CV Manager ───────────────────────────────────────────────────────────────
+function CVManager() {
+  const [file, setFile] = useState(null)
+  const [uploading, setUploading] = useState(false)
+  const [message, setMessage] = useState('')
+
+  const handleUpload = async (e) => {
+    e.preventDefault()
+    if (!file) return
+
+    const formData = new FormData()
+    formData.append('cv', file)
+
+    setUploading(true)
+    setMessage('')
+    try {
+      await api.post('/cv/upload', formData, {
+        headers: { 'Content-Type': 'multipart/form-data' }
+      })
+      setMessage('✅ CV updated successfully!')
+      setFile(null)
+    } catch (err) {
+      setMessage('❌ Failed to upload CV. Make sure it is a PDF.')
+    } finally {
+      setUploading(false)
+    }
+  }
+
+  return (
+    <div style={{ maxWidth: 500 }}>
+      <h2 style={{ fontFamily: 'var(--font-display)', fontSize: '1.8rem', fontWeight: 800, marginBottom: '2rem' }}>CV Management</h2>
+      <div style={{ background: 'var(--card)', border: '0.5px solid var(--border)', borderRadius: 12, padding: '2rem' }}>
+        <p style={{ fontSize: '0.9rem', color: 'var(--muted)', marginBottom: '1.5rem' }}>
+          Upload your latest CV in PDF format. This will replace the existing one and will be available for preview and download on your portfolio.
+        </p>
+        <form onSubmit={handleUpload}>
+          <input
+            type="file"
+            accept=".pdf"
+            onChange={e => setFile(e.target.files[0])}
+            style={{ marginBottom: '1rem', display: 'block', fontSize: '0.85rem' }}
+          />
+          <button
+            type="submit"
+            disabled={!file || uploading}
+            className="btn-primary"
+            style={{ padding: '10px 20px', fontSize: '0.8rem' }}
+          >
+            {uploading ? 'Uploading...' : 'Upload CV'}
+          </button>
+        </form>
+        {message && (
+          <div style={{
+            marginTop: '1.5rem', padding: '10px', borderRadius: 6,
+            fontSize: '0.85rem', background: 'rgba(255,255,255,0.05)',
+            border: '1px solid var(--border)'
+          }}>
+            {message}
+          </div>
+        )}
+      </div>
+
+      <div style={{ marginTop: '2rem', display: 'flex', gap: '1rem' }}>
+        <a href="/api/cv/preview" target="_blank" className="btn-outline" style={{ padding: '8px 16px', fontSize: '0.75rem' }}>Current CV Preview ↗</a>
       </div>
     </div>
   )
