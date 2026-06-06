@@ -109,3 +109,33 @@ input, textarea { font-family: inherit; }
   0%, 100% { opacity: 1; }
   50% { opacity: 0; }
 }
+
+/* ==========================================================================
+   تعديلات الموبايل والشاشات الصغيرة (Responsive Fixes)
+   ========================================================================== */
+@media (max-width: 768px) {
+  body {
+    /* ترجيع الماوس الأصلي للموبايل عشان اللمس يشتغل تمام */
+    cursor: auto !important; 
+    overflow-x: hidden;
+  }
+
+  /* إخفاء ديرة الماوس تماماً على الموبايل لأنها بتبوظ اللمس والسكرول */
+  #cursor-dot, 
+  #cursor-ring {
+    display: none !important;
+    pointer-events: none !important;
+  }
+
+  /* إجبار الزراير إنها تقبل اللمس الطبيعي */
+  button, a, .btn-primary, .btn-outline {
+    cursor: auto !important;
+  }
+
+  /* حل أمان في حال الـ JS بتاع الـ reveal علق في الموبايل */
+  .reveal {
+    opacity: 1 !important;
+    transform: none !important;
+    transition: none !important;
+  }
+}
