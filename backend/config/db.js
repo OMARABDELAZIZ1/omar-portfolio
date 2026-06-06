@@ -12,7 +12,7 @@ const inMemory = {
     { id: 6, title: 'Developer Portfolio', category: 'Web', description: 'Personal advanced portfolio with analytics and admin dashboard', tech_stack: 'React, Node.js, Express', live_url: 'https://frontend-steps--stevaabdelaziz.replit.app', github_url: 'https://github.com/OMARABDELAZIZ1', featured: 1, created_at: new Date().toISOString() }
   ],
   contacts: [],
-  analytics: { visitors: 142, project_views: 389, cv_downloads: 27 },
+  analytics: { visitors: 142, project_views: 389, cv_downloads: 27, cv_views: 12 },
   nextProjectId: 7,
   nextContactId: 1
 };
@@ -207,6 +207,7 @@ const db = {
         visitors: inMemory.analytics.visitors,
         project_views: inMemory.analytics.project_views,
         cv_downloads: inMemory.analytics.cv_downloads,
+        cv_views: inMemory.analytics.cv_views || 0,
         total_projects: inMemory.projects.length,
         total_contacts: inMemory.contacts.length
       };
@@ -214,9 +215,10 @@ const db = {
     const [[{ visitors }]] = await pool.query("SELECT COUNT(*) as visitors FROM analytics WHERE event_type='page_view'");
     const [[{ project_views }]] = await pool.query("SELECT COUNT(*) as project_views FROM analytics WHERE event_type='project_view'");
     const [[{ cv_downloads }]] = await pool.query("SELECT COUNT(*) as cv_downloads FROM analytics WHERE event_type='cv_download'");
+    const [[{ cv_views }]] = await pool.query("SELECT COUNT(*) as cv_views FROM analytics WHERE event_type='cv_view'");
     const [[{ total_projects }]] = await pool.query('SELECT COUNT(*) as total_projects FROM projects');
     const [[{ total_contacts }]] = await pool.query('SELECT COUNT(*) as total_contacts FROM contacts');
-    return { visitors, project_views, cv_downloads, total_projects, total_contacts };
+    return { visitors, project_views, cv_downloads, cv_views, total_projects, total_contacts };
   },
 
   async trackEvent(type, metadata) {
@@ -224,6 +226,7 @@ const db = {
       if (type === 'page_view') inMemory.analytics.visitors++;
       if (type === 'project_view') inMemory.analytics.project_views++;
       if (type === 'cv_download') inMemory.analytics.cv_downloads++;
+      if (type === 'cv_view') inMemory.analytics.cv_views = (inMemory.analytics.cv_views || 0) + 1;
       return;
     }
     await pool.query('INSERT INTO analytics (event_type, metadata) VALUES (?, ?)', [type, JSON.stringify(metadata || {})]);

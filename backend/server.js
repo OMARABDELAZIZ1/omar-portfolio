@@ -35,6 +35,7 @@ app.use('/api/auth', require('./routes/auth'));
 app.use('/api/projects', require('./routes/projects'));
 app.use('/api/contact', require('./routes/contact'));
 app.use('/api/stats', require('./routes/stats'));
+app.use('/api/cv', require('./routes/cv'));
 
 // 404
 app.use((req, res) => res.status(404).json({ error: 'Route not found' }));
